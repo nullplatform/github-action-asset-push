@@ -1,0 +1,53 @@
+name: Asset Push
+description: This is a GitHub Action designed to push built assets required by Nullplatform
+inputs:
+  build-id:
+    description: The type of asset to be pushed. One of docker-image, lambda, etc.
+    required: true
+  type:
+    description: The type of asset to be pushed. One of docker-image, lambda, etc.
+    required: true
+  path:
+    description: The path to the source code that need to be built
+    required: false
+    default: .
+  output-path:
+    description: The path to the assets built
+    required: false
+    default: build
+  name:
+    description: The name of the asset being pushed
+    required: false
+    default: main
+runs:
+  using: composite
+  steps:
+    - name: Create asset for build
+      id: create-asset
+      uses: nullplatform/github-action-asset@v1
+      with:
+        action: create
+        build-id: ${{ inputs.build-id }}
+        type: ${{ inputs.type }}
+        name: ${{ inputs.name }}
+    - name: Push asset
+      id: push-asset
+      shell: bash
+      env:
+        ASSET_WORKING_DIRECTORY: ${{ inputs.path }}
+        ASSET_OUTPUT_DIRECTORY: ${{ inputs.path }}/${{ inputs.output-path }}
+        ASSET_NAME: ${{ inputs.name }}
+        ASSET_TARGET_URL: ${{ fromJson(steps.create-asset.outputs.targets)[0].url }}
+      run: |
+        make_file_path="${{ inputs.path }}"
+        make_file_task="push"
+        if [ ! -f "$make_file_path/makefile" ] && [ ! -f "$make_file_path/Makefile" ]; then
+          echo "Makefile not found in the '${{ inputs.path }}' folder. Using defaults."
+          make_file_path="${{ github.action_path }}"
+          make_file_task="push-${{ inputs.type }}"
+        fi
+        make -C $make_file_path $make_file_task \
+          ASSET_WORKING_DIRECTORY=$ASSET_WORKING_DIRECTORY \
+          ASSET_OUTPUT_DIRECTORY=$ASSET_OUTPUT_DIRECTORY \
+          ASSET_NAME=$ASSET_NAME \
+          ASSET_TARGET_URL=$ASSET_TARGET_URL
