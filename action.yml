@@ -22,6 +22,17 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: Configure AWS credentials
+      id: configure-aws-credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ env.BUILD_AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ env.BUILD_AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.BUILD_AWS_REGION }}
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+      if: ${{ inputs.type == 'docker-image' }}
     - name: Create asset for build
       id: create-asset
       uses: nullplatform/github-action-asset@v1
