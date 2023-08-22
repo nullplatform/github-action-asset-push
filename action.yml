@@ -93,6 +93,10 @@ runs:
           echo "Makefile not found in the '${{ steps.sanitize-paths.outputs.build-working-directory }}' folder. Using defaults."
           make_file_path="${{ github.action_path }}"
           make_file_task="push-${{ inputs.type }}"
+          # Override directories to work with default Makefile
+          BUILD_WORKING_DIRECTORY=$(realpath "$BUILD_WORKING_DIRECTORY")
+          ASSET_WORKING_DIRECTORY=$(realpath "$ASSET_WORKING_DIRECTORY")
+          ASSET_OUTPUT_DIRECTORY=$(realpath "$ASSET_OUTPUT_DIRECTORY")
         fi
         make -C $make_file_path $make_file_task \
           BUILD_WORKING_DIRECTORY=$BUILD_WORKING_DIRECTORY \
