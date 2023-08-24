@@ -23,6 +23,9 @@ inputs:
     description: The name of the asset being pushed
     required: false
     default: main
+  url:
+    description: Predefined asset URL. This is an advanced usage and is not recommended, use *type* and *name* instead
+    required: false
   api-key:
     description: The API key required for authentication if not logged in
     required: false
@@ -65,10 +68,12 @@ runs:
         aws-access-key-id: ${{ env.BUILD_AWS_ACCESS_KEY }}
         aws-secret-access-key: ${{ env.BUILD_AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.BUILD_AWS_REGION }}
-    - name: Login to Amazon ECR
+        role-to-assume: ${{ env.BUILD_AWS_ROLE_TO_ASSUME }}
+        role-chaining: ${{ env.BUILD_AWS_ROLE_CHAINING }}
+    - if: ${{ inputs.type == 'docker-image' }}
+      name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
-      if: ${{ inputs.type == 'docker-image' }}
     - name: Create asset for build
       id: create-asset
       uses: nullplatform/github-action-asset@v1
@@ -77,6 +82,7 @@ runs:
         build-id: ${{ inputs.build-id }}
         type: ${{ inputs.type }}
         name: ${{ inputs.name }}
+        url: ${{ inputs.url }}
     - name: Push asset
       id: push-asset
       shell: bash
