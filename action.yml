@@ -71,6 +71,7 @@ runs:
         role-to-assume: ${{ env.BUILD_AWS_ROLE_TO_ASSUME }}
         role-chaining: ${{ env.BUILD_AWS_ROLE_CHAINING }}
         role-skip-session-tagging: true
+        role-duration-seconds: 300
     - if: ${{ inputs.type == 'docker-image' }}
       name: Login to Amazon ECR
       id: login-ecr
