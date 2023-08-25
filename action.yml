@@ -70,6 +70,7 @@ runs:
         aws-region: ${{ env.BUILD_AWS_REGION }}
         role-to-assume: ${{ env.BUILD_AWS_ROLE_TO_ASSUME }}
         role-chaining: ${{ env.BUILD_AWS_ROLE_CHAINING }}
+        role-skip-session-tagging: true
     - if: ${{ inputs.type == 'docker-image' }}
       name: Login to Amazon ECR
       id: login-ecr
