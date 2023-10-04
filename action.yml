@@ -92,6 +92,7 @@ runs:
         ASSET_WORKING_DIRECTORY: ${{ steps.sanitize-paths.outputs.asset-working-directory }}
         ASSET_OUTPUT_DIRECTORY: ${{ steps.sanitize-paths.outputs.asset-working-directory }}/${{ steps.sanitize-paths.outputs.asset-output-directory }}
         ASSET_NAME: ${{ inputs.name }}
+        ASSET_TYPE: ${{ inputs.type }}
         ASSET_TARGET_URL: ${{ fromJson(steps.create-asset.outputs.targets)[0].url }}
       run: |
         make_file_path="${{ steps.sanitize-paths.outputs.build-working-directory }}"
@@ -110,4 +111,5 @@ runs:
           ASSET_WORKING_DIRECTORY=$ASSET_WORKING_DIRECTORY \
           ASSET_OUTPUT_DIRECTORY=$ASSET_OUTPUT_DIRECTORY \
           ASSET_NAME=$ASSET_NAME \
+          ASSET_TYPE=$ASSET_TYPE \
           ASSET_TARGET_URL=$ASSET_TARGET_URL
