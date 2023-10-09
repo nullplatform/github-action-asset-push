@@ -19,7 +19,10 @@ The "Nullplatform Asset Push" GitHub Action automates the process of pushing bui
 - [Usage Examples](#usage-examples)
   - [Use Case 1: Push a Docker Image](#use-case-1-push-a-docker-image)
   - [Use Case 2: Push a Lambda Function](#use-case-2-push-a-lambda-function)
-  - [Use Case 3: Custom Directories and AWS Credentials](#use-case-3-custom-directories)
+  - [Use Case 3: Custom Directory](#use-case-3-custom-directory)
+- [Supported Repositories](#supported-repositories)
+  - [Github Packages](#github-packages)
+  - [AWS (ECR and S3)](#aws-ecr-and-s3)
 - [No Dependencies or Commands](#no-dependencies-or-commands)
 - [License](#license)
 
@@ -152,10 +155,10 @@ jobs:
 
 In this example, the action pushes a Lambda function with the name `my-lambda-function`.
 
-### Use Case 3: Custom Directories
+### Use Case 3: Custom Directory
 
 ```yaml
-name: Custom Directories and AWS Credentials
+name: Custom Directory
 
 on:
   push:
@@ -170,7 +173,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Push Assets with Custom Directories
+      - name: Push Assets with Custom Directory
         id: push-assets-custom
         uses: nullplatform/github-action-asset-push@v1
         with:
@@ -178,9 +181,6 @@ jobs:
           type: docker-image
           name: custom-docker-image
           build-working-directory: path/to/build
-          asset-working-directory: path/to/assets
-          asset-output-directory: output
-          api-key: ${{ secrets.NULLPLATFORM_API_KEY }}
 
       ##
       ## Other steps
@@ -188,7 +188,30 @@ jobs:
 
 ```
 
-In this example, the action pushes a Docker image from custom directories (`path/to/build` and `path/to/assets`).
+In this example, the action pushes a Docker image from custom directory `path/to/build`.
+
+## Supported Repositories
+
+This action supports the following repositories out of the box:
+
+### GitHub Packages
+
+To use this action with GitHub Packages, you must configure the following permissions in your workflow YAML:
+
+```yaml
+permissions:
+  contents: read
+  packages: write
+```
+
+### AWS (ECR and S3)
+
+This action supports authentication for AWS repositories, including ECR (Elastic Container Registry) and S3 (Simple Storage Service). You can configure authentication using the following methods:
+
+* **Access Key and Access Secret**: Provide your AWS access key and secret access key for authentication.
+* **Role to Assume**: You can specify a role to assume with support for chaining.
+
+The required parameters for authentication are automatically provided by our [secrets and variables action](https://github.com/nullplatform/github-action-secrets-and-variables).
 
 ## No Dependencies or Commands
 
