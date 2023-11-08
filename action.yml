@@ -76,13 +76,13 @@ runs:
       run: echo "ASSET_REPOSITORY_PROVIDER=${{ fromJson(steps.create-asset.outputs.targets)[0].provider }}" >> $GITHUB_ENV
     - if: ${{ contains(fromJSON('["aws-ecr", "aws-s3"]'), env.ASSET_REPOSITORY_PROVIDER) }}
       name: Setup AWS Asset Repository Provider
-      id: ci-setup-multiple
+      id: ci-setup-aws-repository-provider
       uses: nullplatform/github-action-asset-push/aws-asset-repository-provider@main
       with:
         type: ${{ inputs.type }}
     - if: ${{ env.ASSET_REPOSITORY_PROVIDER == 'azure-container-registry' }}
       name: Setup Azure Asset Repository Provider
-      id: ci-setup-multiple
+      id: ci-setup-azure-repository-provider
       uses: nullplatform/github-action-asset-push/azure-asset-repository-provider@main
       with:
         type: ${{ inputs.type }}
