@@ -61,20 +61,6 @@ runs:
         echo "build-working-directory=$build_working_directory" >> "$GITHUB_OUTPUT"
         echo "asset-working-directory=$asset_working_directory" >> "$GITHUB_OUTPUT"
         echo "asset-output-directory=$asset_output_directory" >> "$GITHUB_OUTPUT"
-    - name: Configure AWS credentials
-      id: configure-aws-credentials
-      uses: aws-actions/configure-aws-credentials@v3
-      with:
-        aws-access-key-id: ${{ env.BUILD_AWS_ACCESS_KEY }}
-        aws-secret-access-key: ${{ env.BUILD_AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.BUILD_AWS_REGION }}
-        role-to-assume: ${{ env.BUILD_AWS_ROLE_TO_ASSUME }}
-        role-chaining: ${{ env.BUILD_AWS_ROLE_CHAINING || false }}
-        role-skip-session-tagging: true
-    - if: ${{ inputs.type == 'docker-image' }}
-      name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
     - name: Create asset for build
       id: create-asset
       uses: nullplatform/github-action-asset@v1
@@ -84,6 +70,22 @@ runs:
         type: ${{ inputs.type }}
         name: ${{ inputs.name }}
         url: ${{ inputs.url }}
+    - name: Save asset repository provider into context
+      id: save-asset-repository-provider
+      shell: bash
+      run: echo "ASSET_REPOSITORY_PROVIDER=${{ fromJson(steps.create-asset.outputs.targets)[0].provider }}" >> $GITHUB_ENV
+    - if: ${{ contains(fromJSON('["aws-ecr", "aws-s3"]'), env.ASSET_REPOSITORY_PROVIDER) }}
+      name: Setup AWS Asset Repository Provider
+      id: ci-setup-multiple
+      uses: nullplatform/github-action-asset-push/aws-asset-repository-provider@v1
+      with:
+        type: ${{ inputs.type }}
+    - if: ${{ env.ASSET_REPOSITORY_PROVIDER == 'azure-container-registry' }}
+      name: Setup Azure Asset Repository Provider
+      id: ci-setup-multiple
+      uses: nullplatform/github-action-asset-push/aws-asset-repository-provider@v1
+      with:
+        type: ${{ inputs.type }}
     - name: Push asset
       id: push-asset
       shell: bash

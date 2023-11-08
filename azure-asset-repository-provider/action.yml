@@ -1,0 +1,15 @@
+name: Setup Azure Asset Repository Provider
+description: This GitHub Action is designed to configure an Azure repository provider
+inputs:
+  type:
+    description: The type of asset to be pushed. One of docker-image, lambda, etc.
+    required: true
+runs:
+  using: composite
+  steps:
+    - if: ${{ inputs.type == 'docker-image' }}
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.BUILD_AZURE_REGISTRY_LOGIN_SERVER }}
+        username: ${{ env.BUILD_AZURE_REGISTRY_USERNAME }}
+        password: ${{ env.BUILD_AZURE_REGISTRY_PASSWORD }}

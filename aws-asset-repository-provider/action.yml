@@ -1,0 +1,23 @@
+name: Setup AWS Asset Repository Provider
+description: This GitHub Action is designed to configure an AWS repository provider
+inputs:
+  type:
+    description: The type of asset to be pushed. One of docker-image, lambda, etc.
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Configure AWS credentials
+      id: configure-aws-credentials
+      uses: aws-actions/configure-aws-credentials@v3
+      with:
+        aws-access-key-id: ${{ env.BUILD_AWS_ACCESS_KEY }}
+        aws-secret-access-key: ${{ env.BUILD_AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.BUILD_AWS_REGION }}
+        role-to-assume: ${{ env.BUILD_AWS_ROLE_TO_ASSUME }}
+        role-chaining: ${{ env.BUILD_AWS_ROLE_CHAINING || false }}
+        role-skip-session-tagging: true
+    - if: ${{ inputs.type == 'docker-image' }}
+      name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
